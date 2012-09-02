@@ -49,6 +49,7 @@ namespace MoqSamples
             ILoggerDependency loggerDependency = Mock.Of<ILoggerDependency>(
                 ld => ld.GetDirectoryByLoggerName(It.IsAny<string>()) == "C:\\Foo");
 
+            // Act
             string directory = loggerDependency.GetDirectoryByLoggerName(loggerName);
             Console.WriteLine("Directory for the logger '{0}' is '{1}'", loggerName, directory);
 
@@ -63,13 +64,13 @@ namespace MoqSamples
             // Arrange
             // Unfortunately I don't know how to create stub that will return different value based on the arguments
             // using v.4 functional specification style
-            Mock<ILoggerDependency> stub = new Mock<ILoggerDependency>();
-
+            
             // Setting up our stub to return different values based on the argument.
             // This code is similar to following implementation:
             // public string GetDirectoryByLoggername(string s) { return "C:\\" + s; }
-            stub
-                .Setup(ld => ld.GetDirectoryByLoggerName(It.IsAny<string>()))
+            Mock<ILoggerDependency> stub = new Mock<ILoggerDependency>();
+            
+            stub.Setup(ld => ld.GetDirectoryByLoggerName(It.IsAny<string>()))
                 .Returns<string>(name => "C:\\" + name);
 
             ILoggerDependency logger = stub.Object;
@@ -106,8 +107,8 @@ namespace MoqSamples
             ILoggerDependency logger = 
                 Mock.Of<ILoggerDependency>(
                     d => d.GetCurrentDirectory() == "D:\\Temp" &&
-                         d.DefaultLogger == "DefaultLogger" &&
-                         d.GetDirectoryByLoggerName(It.IsAny<string>()) == "C:\\Temp");
+                            d.DefaultLogger == "DefaultLogger" &&
+                            d.GetDirectoryByLoggerName(It.IsAny<string>()) == "C:\\Temp");
 
             // Assert
             Assert.That(logger.GetCurrentDirectory(), Is.EqualTo("D:\\Temp"));
@@ -119,8 +120,6 @@ namespace MoqSamples
         public void Test_Initialize_Multiple_Stubs_Using_Setup_Calls()
         {
             // Arrange
-            // Moq v.4 introduces new feature called "moq functional specification".
-            // Using this new syntax we're able to setup several stubs in one expression
             Mock<ILoggerDependency> stub = new Mock<ILoggerDependency>();
             stub.Setup(ld => ld.GetCurrentDirectory()).Returns("D:\\Temp");
             stub.Setup(ld => ld.GetDirectoryByLoggerName(It.IsAny<string>())).Returns("C:\\Temp");
@@ -142,12 +141,11 @@ namespace MoqSamples
             // members and use old imperative syntax for some other members
             ILoggerDependency logger = Mock.Of<ILoggerDependency>(
                 ld => ld.GetCurrentDirectory() == "D:\\Temp"
-                   && ld.DefaultLogger == "DefaultLogger");
+                    && ld.DefaultLogger == "DefaultLogger");
 
-            // Getting mock-object itself by a mocked interface
-            Mock<ILoggerDependency> stub = Mock.Get(logger);
-
-            stub.Setup(ld => ld.GetDirectoryByLoggerName(It.IsAny<string>()))
+            // Setting up more complex scenario for GetDirectoryByLoggerName
+            Mock.Get(logger)
+                .Setup(ld => ld.GetDirectoryByLoggerName(It.IsAny<string>()))
                 .Returns<string>(loggerName => "C:\\" + loggerName);
 
             // Assert

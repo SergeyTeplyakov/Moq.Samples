@@ -30,6 +30,21 @@ namespace MoqSamples
             // Checking that Write method of the ILogWriter was called
             mock.Verify(lw => lw.Write(It.IsAny<string>()));
         }
+        
+        [Test]
+        public void Test_WriteLine_Calls_Write_With_Appropriate_Argument()
+        {
+            // Arrange
+            var mock = new Mock<ILogWriter>();
+            var logger = new Logger(mock.Object);
+
+            // Act
+            logger.WriteLine("Hello, logger!");
+
+            // Assert
+            // Checking that Write method was called with appropriate argument
+            mock.Verify(lw => lw.Write("Hello, logger!"));
+        }
 
         [Test]
         public void Test_WriteLine_Called_Exactly_Once()
